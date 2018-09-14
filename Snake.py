@@ -1,257 +1,131 @@
-# Snake game
-# 10x10 RGB LED Matrix "Snake" game
-
-
-#===========================================================================================================#
-
-#SCRAPPED VERSIONS OF FUNCTIONS IN CASE UPDATED VERSIONS CREATE ERRORS:
-
-#----------------------scrapped because wrong--------------------------#
-#def random_fruit_drop(snake_body_length, recent_100):                 #                
-#    possible_fruit_cell = recent_100[:-snake_body_length]             #                
-#    random_position = random.randint(0,len(possible_fruit_cell)-1)    #                
-#    return possible_fruit_cell[random_position]                       #                
-#----------------------------------------------------------------------#
-
-#-----------scrapped because too complicated for no reason-------------#
-#def check_collision(all_snake_positions, head_pos):                   #                     
-#    for i in enumerate(all_snake_positions):                          #                                                           
-#        if i == len(all_snake_positions):                             #
-#            break                                                     #
-#        elif all_snake_positions[i] == head_pos:                      #  
-#            alive = False                                             #
-#        else:                                                         #
-#            pass                                                      #
-#----------------------------------------------------------------------#
-
-#===========================================================================================================#
-
-# LED strip configuration:
-LED_COUNT      = 100     # Number of LED pixels.
-LED_PIN        = 18      # GPIO pin connected to the pixels 
-LED_FREQ_HZ    = 800000  # LED signal frequency in hertz 
-LED_DMA        = 5       # DMA channel to use for generating signal 
-LED_BRIGHTNESS = 155     # Set to 0 for darkest and 255 for brightest
-LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
-# LED strip configuration\
-
 import random
 import time
+from enum import Enum
 
-alive = True 
-head_pos = 42                                                                           #starting point at LED #42, obviously.
-direction = 0                                                                           #starting direction is moving from left to right
-fruit_location = 44
+# Snake game
+# 10x10 RGB LED Matrix "Snake" game
+# LED strip configuration:
+LED_COUNT = 100  # Number of LED pixels.
+LED_PIN = 18  # GPIO pin connected to the pixels
+LED_FREQ_HZ = 800000  # LED signal frequency in hertz
+LED_DMA = 5  # DMA channel to use for generating signal
+LED_BRIGHTNESS = 155  # Set to 0 for darkest and 255 for brightest
+LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
+# LED strip configuration\
 
-snake_body_length = 1                                                                   #lenght of the snakes body in pixels, also amount of fruit eaten -1
-recent_100 = []
-for i in range (1,42):
-    recent_100.append(i)
-for i in range (43,101):
-    recent_100.append(i)
-recent_100.append(42)                                                                  #adding all values from 1-100 with 42 being the last one added
-                                                                      
 
-all_snake_positions = []
+class Direction(Enum):
+    RIGHT = 0
+    DOWN = 1
+    LEFT = 2
+    UP = 3
 
-#def check_everything(recent_100,snake_body_length,all_snake_positions,head_pos):
-# 
-#    if len(recent_100) >= 100:                                                          #----------------------------------ADJUST RECENT_100:------------------------------------------                                                    
-#        recent_100.pop(0)
-#    else:
-#        pass
-#    recent_100.append(head_pos)
-#  
-#    all_snake_positions = recent_100[-snake_body_length:]                               #give positions of all parts of the snake
-#
-#    if head_pos in all_snake_positions[0:snake_body_length-1]:                          #----------------------------------CHECKING COLLISION:-----------------------------------------
-#        alive = False
-#    else:
-#        pass
-#                                                                                                                                                                                   
-#    if head_pos == fruit_location:                                                      #---------------------------------CHECKING IF FRUIT IS DEVOURED:-------------------------------
-#        snake_body_length += 1                                                          #if the head of the snake matches the random fruit drop, increase lenght by one
-#        all_snake_positions = recent_100[-snake_body_length:]                           #update the snake to actually make it one pixel longer
-#        random_fruit_drop(snake_body_length,recent_100)                                 #create new fruit drop
-#    else:       
-#        pass
-#    return snake_body_length, all_snake_positions    
-    
-        
-def random_fruit_drop(snake_body_length,recent_100):                                    #function to spawn fruit on a non-occupied pixel                       
-    fruit_location = random.randint(1,100)                                              #creates a random value between 1 and 100
-    while fruit_location in recent_100[-snake_body_length:]:                            #repeats until that value is not matching with any of the values in "all_snake_positions"
-        fruit_location = random.randint(1,100)
-    return fruit_location
-
-def check_body_length(recent_100):
-    if len(recent_100) >= 100:                                                          #checking if the list is full (100+)
-        recent_100.pop(0)                                                               #if so, erasing first entry
-    recent_100.append(head_pos)                                                         #adding current position to recent list
-
-def increase_body_length(recent_100,snake_body_length):                                 #adding the other pixels to the snake body
-    all_snake_positions = recent_100[-snake_body_length:]
-    return all_snake_positions                                                          #giving out a list of all positions 
-
-def check_collision(all_snake_positions, head_pos):                                     #checks if the snake collides with itself, resulting in a game over                                
-    if head_pos in all_snake_positions[0:snake_body_length-1]:                          #this is done by comparing the current head position with the array of all snake positions except the last one (head_pos itself)
-        alive = False                                                                   #if that position is in there already, it means the snake has crossed paths with itself.
-    else:
-        pass
-
-print(alive)
-
-random_fruit_drop(snake_body_length,recent_100)
-print(fruit_location) 
-
-while alive == False:
-
-    print("Game Over") 
-
-while alive == True:
-    
-    if direction == 0:                                                                  #from left to right (starting direction)
-        keyboard_input = input()
-        if keyboard_input == "r": #change this to "while button_r = True"
-            if head_pos >= 91:                            
-                head_pos = head_pos - 90
-                time.sleep(0.2)                
-                check_body_length(recent_100)
-                increase_body_length(recent_100,snake_body_length)
-                direction = 1
-            else:                           
-                head_pos = head_pos + 10
-                time.sleep(0.2)               
-                check_body_length(recent_100)
-                increase_body_length(recent_100,snake_body_length)
-                direction = 1
-
-        elif keyboard_input == "l":
-            if head_pos <= 10:
-                head_pos = head_pos + 90
-                time.sleep(0.2)                
-                check_body_length(recent_100)
-                direction = 3
-            else:
-                head_pos = head_pos - 10
-                time.sleep(0.2)
-                check_body_length(recent_100)
-                direction = 3
-        
+    def succ(self):
+        if self is Direction.UP:
+            return Direction.RIGHT
         else:
-            if head_pos % 10 == 0:
-                head_pos = head_pos - 9         
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-            else:
-                head_pos += 1
-                time.sleep(0.2)                
-                check_body_length(recent_100)
+            return Direction(self.value + 1)
 
-    if direction == 1:                                                                       #from top to bottom 
-        keyboard_input = input()
-        if keyboard_input == "r":
-            if head_pos %10 == 1:
-                head_pos = head_pos + 9
-                time.sleep(0.2)                
-                check_body_length(recent_100)
-                direction = 2
-            else:
-                head_pos = head_pos - 1
-                time.sleep(0.2)                
-                check_body_length(recent_100)
-                direction = 2
-
-        elif keyboard_input == "l":
-            if head_pos % 10 == 0:
-                head_pos = head_pos - 9
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 0
-            else:
-                head_pos = head_pos + 1
-                time.sleep(0.2)                
-                check_body_length(recent_100)
-                direction = 0
-
+    def pred(self):
+        if self is Direction.RIGHT:
+            return Direction.UP
         else:
+            return Direction(self.value - 1)
+
+
+class ButtonPress(Enum):
+    LEFT = 0
+    RIGHT = 1
+
+
+class Snake:
+    def __init__(self):
+        self.current_locations = [42]
+        self.fruit_location = random.choice([x for x in list(range(1, 100)) if x not in self.current_locations]) 
+        print("the fruit location is: " + str(self.fruit_location))
+        self.direction = Direction.RIGHT
+        self.alive = True
+        self.set_random_fruit_drop()
+
+    def is_alive(self):
+        return self.alive
+
+    def button_input(self, button_pressed):
+        if button_pressed is ButtonPress.LEFT:
+            self.direction = self.direction.pred()
+        elif button_pressed is ButtonPress.RIGHT:
+            self.direction = self.direction.succ()
+
+    def set_random_fruit_drop(self):
+        self.fruit_location = random.choice([x for x in list(range(1, 100)) if x not in self.current_locations])
+        print("the fruit location is: " + str(self.fruit_location))
+
+    def check_collision_self(self, location_to_move_to):
+        if location_to_move_to in self.current_locations[1:]:
+            return True
+        else:
+            return False
+
+    def check_collision_fruit(self, location_to_move):
+        if location_to_move is self.fruit_location:
+            return True
+        else:
+            return False
+
+    def move(self):
+        print("current location is:" + self.current_locations.__str__())
+        head_pos = self.current_locations[-1]
+
+        if self.direction is Direction.RIGHT:
+            if head_pos % 10 == 0:
+                move_location = head_pos - 9
+            else:
+                move_location = head_pos + 1
+
+        elif self.direction is Direction.DOWN:
             if head_pos >= 91:
-                head_pos = head_pos - 90         
-                time.sleep(0.2)                
-                check_body_length(recent_100)
+                move_location = head_pos - 90
             else:
-                head_pos = head_pos + 10
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
+                move_location = head_pos + 10
 
-    if direction == 2:                                                                       #from right to left 
-        keyboard_input = input()
-        if keyboard_input == "r":
-            if head_pos <=10:
-                head_pos = head_pos + 90
-                time.sleep(0.2)               
-                check_body_length(recent_100)
-                direction = 3
+        elif self.direction is Direction.LEFT:
+            if head_pos % 10 == 1:
+                move_location = head_pos + 9
             else:
-                head_pos = head_pos - 10
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 3
+                move_location = head_pos - 1
 
-        elif keyboard_input == "l":
-            if head_pos >=91:
-                head_pos = head_pos - 90
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 1
+        elif self.direction is Direction.UP:
+            if head_pos <= 10:
+                move_location = head_pos + 90
             else:
-                head_pos = head_pos + 10
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 1
+                move_location = head_pos - 10
 
+        if self.check_collision_self(move_location) is True:
+            self.alive = False
+            return
+
+        self.current_locations.append(move_location)
+
+        if self.check_collision_fruit(move_location) is True:
+            self.set_random_fruit_drop()
         else:
-            if head_pos %10 == 1:
-                head_pos = head_pos + 9         
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-            else:
-                head_pos = head_pos - 1
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
+            # moves the tail one step further
+            self.current_locations.pop(0)
 
-    if direction == 3:                                                                      #from bottom to top
-        keyboard_input = input()
-        if keyboard_input == "r":
-            if head_pos %10 == 0:
-                head_pos = head_pos - 9
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 0
-            else:
-                head_pos = head_pos +1
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 0
+        print("current positions are" + self.current_locations.__str__())
+        
 
-        elif keyboard_input == "l":
-            if head_pos %10 == 1:
-                head_pos = head_pos + 9
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
-                direction = 2
-            else:                
-                head_pos = head_pos - 1
-                time.sleep(0.2)               
-                check_body_length(recent_100) 
-                direction = 2
 
-        else:
-            if head_pos <=10:                
-                head_pos = head_pos + 90        
-                time.sleep(0.2)                
-                check_body_length(recent_100)                 
-            else:               
-                head_pos = head_pos - 10
-                time.sleep(0.2)                
-                check_body_length(recent_100) 
+snake = Snake()
+print(snake.is_alive())
+while snake.is_alive() is False:
+    print("Game Over")
+
+while snake.is_alive() is True:
+    time.sleep(0.5)
+    keyboard_input = input()
+    if keyboard_input is "r":
+        snake.button_input(ButtonPress.RIGHT)
+    elif keyboard_input is "l":
+        snake.button_input(ButtonPress.LEFT)
+    snake.move()
