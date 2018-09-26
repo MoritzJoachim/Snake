@@ -1,5 +1,6 @@
 import random
 import time
+import datetime
 from enum import Enum
 
 # Snake game
@@ -52,6 +53,8 @@ class Snake:
         self.direction = Direction.RIGHT    
         self.alive = True
         self.set_random_fruit_drop()
+        self.button_r_pressed = False
+        self.button_l_pressed = False
 
     def is_alive(self):
         return self.alive
@@ -152,12 +155,26 @@ while snake.is_alive() is False:
     print("Game Over")
 
 while snake.is_alive() is True:
-    # this delay is used as the speed of the snake
-    time.sleep(0.5)
-    # this keyboard input will later be replaced by actual button input, this is still run in console
-    keyboard_input = input()
-    if keyboard_input is "r":
+    time_start = datetime.datetime.now()
+    while delta < 500000:
+        time_end = datetime.datetime.now()
+        delta = (time_end - time_start).microseconds
+        if button_r is True:
+            self.button_r_pressed = True
+        elif button_l is True:
+            self.button_l_pressed = True
+    type(delta)
+    if self.button_r_pressed == True:
         snake.button_input(ButtonPress.RIGHT)
-    elif keyboard_input is "l":
+        self.button_r_pressed = False
+    elif self.button_l_pressed == True:
         snake.button_input(ButtonPress.LEFT)
+        self.button_l_pressed = False
     snake.move()
+
+
+
+
+
+
+ 
